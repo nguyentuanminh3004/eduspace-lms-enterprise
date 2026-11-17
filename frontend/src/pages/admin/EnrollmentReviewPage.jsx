@@ -28,7 +28,7 @@ export default function EnrollmentReviewPage() {
       setBanner(data.message);
       loadData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Thao tác phê duyệt thất bại.');
+      alert(err.response?.data?.message || 'Thao t�c ph� duy?t th?t b?i.');
     }
   };
 
@@ -40,7 +40,7 @@ export default function EnrollmentReviewPage() {
       setAutoApprove(!autoApprove);
       setBanner(data.message);
     } catch (err) {
-      alert(err.response?.data?.message || 'Không thể đổi cấu hình.');
+      alert(err.response?.data?.message || 'Kh�ng th? d?i c?u h�nh.');
     }
   };
 
@@ -50,11 +50,11 @@ export default function EnrollmentReviewPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Phê duyệt Yêu cầu Ghi danh Học phần</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Ph� duy?t Y�u c?u Ghi danh H?c ph?n</h1>
           <p className="text-sm text-slate-600 mt-1">
             {user?.role === 'admin'
-              ? 'Quản trị viên xem và xét duyệt toàn bộ yêu cầu đăng ký lớp học trên hệ thống.'
-              : 'Giảng viên xét duyệt sinh viên đăng ký vào các học phần do bạn phụ trách.'}
+              ? 'Qu?n tr? vi�n xem v� x�t duy?t to�n b? y�u c?u dang k� l?p h?c tr�n h? th?ng.'
+              : 'Gi?ng vi�n x�t duy?t sinh vi�n dang k� v�o c�c h?c ph?n do b?n ph? tr�ch.'}
           </p>
         </div>
 
@@ -62,11 +62,11 @@ export default function EnrollmentReviewPage() {
           {user?.role === 'admin' && (
             <Button variant={autoApprove ? 'primary' : 'outline'} size="sm" onClick={handleToggleAuto}>
               <ShieldCheck className="w-4 h-4 mr-1.5" />
-              Duyệt tự động: {autoApprove ? 'ĐANG BẬT' : 'THỦ CÔNG'}
+              Duy?t t? d?ng: {autoApprove ? '�ANG B?T' : 'TH? C�NG'}
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={loadData}>
-            <RefreshCw className="w-4 h-4 mr-1.5" /> Làm mới
+            <RefreshCw className="w-4 h-4 mr-1.5" /> L�m m?i
           </Button>
         </div>
       </div>
@@ -79,10 +79,10 @@ export default function EnrollmentReviewPage() {
 
       <div className="flex gap-2">
         {[
-          { id: 'all', label: `Tất cả (${enrollments.length})` },
-          { id: 'pending', label: `Chờ duyệt (${enrollments.filter((e) => e.status === 'pending').length})` },
-          { id: 'active', label: `Đã duyệt (${enrollments.filter((e) => e.status === 'active').length})` },
-          { id: 'rejected', label: `Từ chối (${enrollments.filter((e) => e.status === 'rejected').length})` },
+          { id: 'all', label: `T?t c? (${enrollments.length})` },
+          { id: 'pending', label: `Ch? duy?t (${enrollments.filter((e) => e.status === 'pending').length})` },
+          { id: 'active', label: `�� duy?t (${enrollments.filter((e) => e.status === 'active').length})` },
+          { id: 'rejected', label: `T? ch?i (${enrollments.filter((e) => e.status === 'rejected').length})` },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -100,11 +100,11 @@ export default function EnrollmentReviewPage() {
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-600">
             <tr>
-              <th className="px-4 py-3">Sinh viên</th>
-              <th className="px-4 py-3">Học phần đăng ký</th>
-              <th className="px-4 py-3">Thời gian gửi</th>
-              <th className="px-4 py-3">Trạng thái</th>
-              <th className="px-4 py-3 text-right">Phê duyệt</th>
+              <th className="px-4 py-3">Sinh vi�n</th>
+              <th className="px-4 py-3">H?c ph?n dang k�</th>
+              <th className="px-4 py-3">Th?i gian g?i</th>
+              <th className="px-4 py-3">Tr?ng th�i</th>
+              <th className="px-4 py-3 text-right">Ph� duy?t</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -112,7 +112,7 @@ export default function EnrollmentReviewPage() {
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
                   <UserCheck className="w-6 h-6 mx-auto text-slate-400 mb-1" />
-                  Không có yêu cầu ghi danh nào trong mục này.
+                  Kh�ng c� y�u c?u ghi danh n�o trong m?c n�y.
                 </td>
               </tr>
             ) : (
@@ -121,7 +121,7 @@ export default function EnrollmentReviewPage() {
                   <td className="px-4 py-3">
                     <div className="font-semibold text-slate-900">{item.student?.fullName}</div>
                     <div className="text-xs text-slate-500">
-                      {item.student?.studentCode ? `${item.student.studentCode} • ` : ''}
+                      {item.student?.studentCode ? `${item.student.studentCode} � ` : ''}
                       {item.student?.email}
                     </div>
                   </td>
@@ -143,25 +143,25 @@ export default function EnrollmentReviewPage() {
                       }`}
                     >
                       {item.status === 'pending'
-                        ? 'Chờ duyệt'
+                        ? 'Ch? duy?t'
                         : item.status === 'rejected'
-                        ? 'Từ chối'
-                        : 'Đã duyệt'}
+                        ? 'T? ch?i'
+                        : '�� duy?t'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
                     {item.status === 'pending' ? (
                       <>
                         <Button variant="primary" size="sm" onClick={() => handleReview(item._id, 'active')}>
-                          <Check className="w-3.5 h-3.5 mr-1" /> Duyệt
+                          <Check className="w-3.5 h-3.5 mr-1" /> Duy?t
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => handleReview(item._id, 'rejected')}>
-                          <X className="w-3.5 h-3.5 mr-1 text-red-600" /> Từ chối
+                          <X className="w-3.5 h-3.5 mr-1 text-red-600" /> T? ch?i
                         </Button>
                       </>
                     ) : (
                       <span className="text-xs text-slate-400">
-                        {item.reviewedBy ? `Bởi: ${item.reviewedBy.fullName}` : 'Tự động'}
+                        {item.reviewedBy ? `B?i: ${item.reviewedBy.fullName}` : 'T? d?ng'}
                       </span>
                     )}
                   </td>
