@@ -40,21 +40,21 @@ export default function CoursesCatalogPage() {
   const handleRequestEnroll = async (course) => {
     try {
       const { data } = await api.post(`/courses/${course._id}/enroll`, {});
-      setNotice(data.message || '�� g?i y�u c?u ghi danh h?c ph?n.');
+      setNotice(data.message || 'Đã gửi yêu cầu ghi danh học phần.');
       fetchData();
     } catch (err) {
-      if (err.response?.data?.message?.includes('M� ghi danh')) {
-        const key = window.prompt(`H?c ph?n [${course.code}] y�u c?u m� ghi danh l?p h?c:`);
+      if (err.response?.data?.message?.includes('Mã ghi danh')) {
+        const key = window.prompt(`Học phần [${course.code}] yêu cầu mã ghi danh lớp học:`);
         if (!key) return;
         try {
           const { data } = await api.post(`/courses/${course._id}/enroll`, { enrollmentKey: key });
           setNotice(data.message);
           fetchData();
         } catch (err2) {
-          alert(err2.response?.data?.message || 'M� ghi danh kh�ng ch�nh x�c.');
+          alert(err2.response?.data?.message || 'Mã ghi danh không chính xác.');
         }
       } else {
-        alert(err.response?.data?.message || 'Kh�ng th? dang k� h?c ph?n.');
+        alert(err.response?.data?.message || 'Không thể đăng ký học phần.');
       }
     }
   };
@@ -63,9 +63,9 @@ export default function CoursesCatalogPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Danh m?c H?c ph?n N?i b?</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Danh mục Học phần Nội bộ</h1>
           <p className="text-sm text-slate-600 mt-1">
-            C�c h?c ph?n dang m? ghi danh trong k? h?c hi?n t?i. Sinh vi�n g?i y�u c?u ghi danh d? Gi?ng vi�n/��o t?o ph� duy?t.
+            Các học phần đang mở ghi danh trong kỳ học hiện tại. Sinh viên gửi yêu cầu ghi danh để Giảng viên/Đào tạo phê duyệt.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export default function CoursesCatalogPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="T�n h?c ph?n, m� HP..."
+              placeholder="Tên học phần, mã HP..."
               className="h-9 pl-9 pr-3 text-sm bg-white border border-slate-300 rounded-md w-60"
             />
           </div>
@@ -91,7 +91,7 @@ export default function CoursesCatalogPage() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="h-9 px-3 text-sm bg-white border border-slate-300 rounded-md"
           >
-            <option value="">T?t c? chuy�n ng�nh</option>
+            <option value="">Tất cả chuyên ngành</option>
             {categories.map((c) => (
               <option key={c._id} value={c._id}>
                 {c.name}
@@ -99,7 +99,7 @@ export default function CoursesCatalogPage() {
             ))}
           </select>
           <Button type="submit" variant="primary" size="sm">
-            L?c
+            Lọc
           </Button>
         </form>
       </div>
@@ -130,15 +130,15 @@ export default function CoursesCatalogPage() {
                   <div className="flex items-center gap-1.5">
                     {status === 'active' || status === 'completed' ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <CheckCircle2 className="w-3 h-3" /> �� duy?t
+                        <CheckCircle2 className="w-3 h-3" /> Đã duyệt
                       </span>
                     ) : status === 'pending' ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                        <Clock className="w-3 h-3" /> Ch? duy?t
+                        <Clock className="w-3 h-3" /> Chờ duyệt
                       </span>
                     ) : status === 'rejected' ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">
-                        <XCircle className="w-3 h-3" /> T? ch?i
+                        <XCircle className="w-3 h-3" /> Từ chối
                       </span>
                     ) : null}
                     <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
@@ -159,21 +159,21 @@ export default function CoursesCatalogPage() {
                     <Users className="w-3.5 h-3.5 text-slate-400" /> {course.teacher?.fullName}
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-400">
-                    <BookOpen className="w-3.5 h-3.5" /> {course.lessons?.length || 0} chuong
+                    <BookOpen className="w-3.5 h-3.5" /> {course.lessons?.length || 0} chương
                   </div>
                 </div>
 
                 {isOwnerOrAdmin || status === 'active' || status === 'completed' ? (
                   <Button variant="primary" size="sm" asChild>
-                    <Link to={`/courses/${course._id}`}>V�o l?p h?c</Link>
+                    <Link to={`/courses/${course._id}`}>Vào lớp học</Link>
                   </Button>
                 ) : status === 'pending' ? (
                   <Button variant="outline" size="sm" disabled>
-                    �ang ch? duy?t
+                    Đang chờ duyệt
                   </Button>
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => handleRequestEnroll(course)}>
-                    <KeyRound className="w-3.5 h-3.5 mr-1" /> �ang k� h?c ph?n
+                    <KeyRound className="w-3.5 h-3.5 mr-1" /> Đăng ký học phần
                   </Button>
                 )}
               </div>

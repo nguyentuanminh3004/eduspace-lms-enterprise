@@ -9,7 +9,7 @@ export default function TeacherDashboardPage() {
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: '', code: '', description: '', category: '', level: 'Co b?n' });
+  const [form, setForm] = useState({ title: '', code: '', description: '', category: '', level: 'Cơ bản' });
 
   const loadData = async () => {
     const [cRes, catRes] = await Promise.all([api.get('/teacher/courses'), api.get('/categories')]);
@@ -26,10 +26,10 @@ export default function TeacherDashboardPage() {
     try {
       await api.post('/courses', form);
       setOpen(false);
-      setForm({ title: '', code: '', description: '', category: '', level: 'Co b?n' });
+      setForm({ title: '', code: '', description: '', category: '', level: 'Cơ bản' });
       loadData();
     } catch (err) {
-      alert(err.response?.data?.message || 'L?i t?o h?c ph?n.');
+      alert(err.response?.data?.message || 'Lỗi tạo học phần.');
     }
   };
 
@@ -37,13 +37,13 @@ export default function TeacherDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="flex items-center justify-between border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Kh�ng gian Gi?ng d?y & Gi�m s�t</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Không gian Giảng dạy & Giám sát</h1>
           <p className="text-sm text-slate-600 mt-1">
-            Qu?n l� d? cuong, m? l?p Jitsi Meet, gi�m s�t vi ph?m thi c? v� ki?m tra tr�ng l?p b�i n?p.
+            Quản lý đề cương, mở lớp Jitsi Meet, giám sát vi phạm thi cử và kiểm tra trùng lặp bài nộp.
           </p>
         </div>
         <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
-          <Plus className="w-4 h-4 mr-1.5" /> T?o H?c ph?n m?i
+          <Plus className="w-4 h-4 mr-1.5" /> Tạo Học phần mới
         </Button>
       </div>
 
@@ -57,10 +57,10 @@ export default function TeacherDashboardPage() {
             </div>
             <div className="flex items-center justify-between pt-3 border-t border-slate-100">
               <span className="text-xs text-slate-500 flex items-center gap-1">
-                <BookOpen className="w-3.5 h-3.5" /> {course.lessons?.length || 0} b�i gi?ng
+                <BookOpen className="w-3.5 h-3.5" /> {course.lessons?.length || 0} bài giảng
               </span>
               <Button variant="outline" size="sm" asChild>
-                <Link to={`/courses/${course._id}`}>�i?u ph?i l?p</Link>
+                <Link to={`/courses/${course._id}`}>Điều phối lớp</Link>
               </Button>
             </div>
           </div>
@@ -70,13 +70,13 @@ export default function TeacherDashboardPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>T?o H?c ph?n M?i</DialogTitle>
-            <DialogDescription>Khai b�o th�ng tin m�n h?c gi?ng d?y trong k?.</DialogDescription>
+            <DialogTitle>Tạo Học phần Mới</DialogTitle>
+            <DialogDescription>Khai báo thông tin môn học giảng dạy trong kỳ.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-medium mb-1">M� HP *</label>
+                <label className="block text-xs font-medium mb-1">Mã HP *</label>
                 <input
                   type="text"
                   required
@@ -86,7 +86,7 @@ export default function TeacherDashboardPage() {
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-xs font-medium mb-1">T�n h?c ph?n *</label>
+                <label className="block text-xs font-medium mb-1">Tên học phần *</label>
                 <input
                   type="text"
                   required
@@ -97,13 +97,13 @@ export default function TeacherDashboardPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Chuy�n ng�nh</label>
+              <label className="block text-xs font-medium mb-1">Chuyên ngành</label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full h-9 px-3 text-sm border border-slate-300 rounded-md bg-white"
               >
-                <option value="">-- Ch?n chuy�n ng�nh --</option>
+                <option value="">-- Chọn chuyên ngành --</option>
                 {categories.map((c) => (
                   <option key={c._id} value={c._id}>
                     {c.name}
@@ -112,7 +112,7 @@ export default function TeacherDashboardPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">M� t? h?c ph?n *</label>
+              <label className="block text-xs font-medium mb-1">Mô tả học phần *</label>
               <textarea
                 rows={3}
                 required
@@ -123,10 +123,10 @@ export default function TeacherDashboardPage() {
             </div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                H?y
+                Hủy
               </Button>
               <Button type="submit" variant="primary">
-                Kh?i t?o
+                Khởi tạo
               </Button>
             </div>
           </form>
