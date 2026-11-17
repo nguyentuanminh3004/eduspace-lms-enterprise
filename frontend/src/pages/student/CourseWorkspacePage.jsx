@@ -73,7 +73,7 @@ export default function CourseWorkspacePage() {
         setEnrolled(true);
         setCompletedLessons(found.completedLessons || []);
       }
-    } catch {}
+    } catch { }
 
     const [aRes, qRes, lRes, dRes] = await Promise.all([
       api.get(`/courses/${id}/assignments`),
@@ -89,7 +89,9 @@ export default function CourseWorkspacePage() {
 
   useEffect(() => {
     fetchAll();
-    const socket = io((import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api$/, ''), { auth: { token: localStorage.getItem('eduspace_token') } });
+    const socket = io((import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api$/, ''), {
+      auth: { token: localStorage.getItem('eduspace_token') },
+    });
     socketRef.current = socket;
 
     socket.on(`proctoring-course-${id}`, (alertData) => {
@@ -129,10 +131,10 @@ export default function CourseWorkspacePage() {
     };
 
     const onVisibilityChange = () => {
-      if (document.hidden) handleViolation('Chuyá»ƒn sang tab/á»©ng dá»¥ng khĂ¡c khi Ä‘ang lĂ m bĂ i');
+      if (document.hidden) handleViolation('Chuyển sang tab/ứng dụng khác khi đang làm bài');
     };
     const onWindowBlur = () => {
-      handleViolation('Rá»i khá»i cá»­a sá»• trĂ¬nh duyá»‡t thi');
+      handleViolation('Rời khỏi cửa sổ trình duyệt thi');
     };
 
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -163,7 +165,7 @@ export default function CourseWorkspacePage() {
     setActiveRoom(session);
     setRoomMessages([]);
 
-    await api.post(`/live/${session._id}/attendance`).catch(() => {});
+    await api.post(`/live/${session._id}/attendance`).catch(() => { });
 
     socketRef.current.emit('join-room', {
       roomCode: session.roomCode,
@@ -193,7 +195,7 @@ export default function CourseWorkspacePage() {
       setEnrolled(true);
       fetchAll();
     } catch (err) {
-      alert(err.response?.data?.message || 'Lá»—i ghi danh.');
+      alert(err.response?.data?.message || 'Lỗi ghi danh.');
     }
   };
 
@@ -216,7 +218,7 @@ export default function CourseWorkspacePage() {
   };
 
   const handleStartNewLive = async () => {
-    const title = prompt('Nháº­p chá»§ Ä‘á» buá»•i há»c trá»±c tuyáº¿n Jitsi Meet:');
+    const title = prompt('Nhập chủ đề buổi học trực tuyến Jitsi Meet:');
     if (!title) return;
     await api.post('/live', { course: id, title });
     fetchAll();
@@ -231,7 +233,7 @@ export default function CourseWorkspacePage() {
     fetchAll();
   };
 
-  if (!course) return <div className="p-8 text-center text-sm text-slate-500">Äang táº£i khĂ´ng gian há»c pháº§n...</div>;
+  if (!course) return <div className="p-8 text-center text-sm text-slate-500">Đang tải không gian học phần...</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
@@ -247,26 +249,26 @@ export default function CourseWorkspacePage() {
           <h1 className="text-2xl font-bold text-slate-900">{course.title}</h1>
           <p className="text-sm text-slate-600 max-w-3xl">{course.description}</p>
           <div className="text-xs text-slate-500 pt-1">
-            Giáº£ng viĂªn phá»¥ trĂ¡ch: <strong className="text-slate-800">{course.teacher?.fullName}</strong>
+            Giảng viên phụ trách: <strong className="text-slate-800">{course.teacher?.fullName}</strong>
           </div>
         </div>
 
         {!enrolled && !isInstructor && (
           <Button variant="primary" size="lg" onClick={handleEnroll}>
-            Ghi danh vĂ o Há»c pháº§n
+            Ghi danh vào Học phần
           </Button>
         )}
       </div>
 
-      {/* Real-time Proctoring Alert Banner cho Giáº£ng viĂªn */}
+      {/* Real-time Proctoring Alert Banner cho Giảng viên */}
       {isInstructor && proctoringAlerts.length > 0 && (
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-bold text-red-800 uppercase">
-            <ShieldAlert className="w-4 h-4" /> Cáº£nh bĂ¡o GiĂ¡m sĂ¡t Thi cá»­ Thá»i gian thá»±c
+            <ShieldAlert className="w-4 h-4" /> Cảnh báo Giám sát Thi cử Thời gian thực
           </div>
           {proctoringAlerts.slice(0, 3).map((al, i) => (
             <div key={i} className="text-xs text-red-700">
-              â€¢ <strong>{al.student?.fullName}</strong> ({al.student?.studentCode}) â€” {al.violationType} (Láº§n {al.count}) trong bĂ i <em>{al.quizTitle}</em>
+              • <strong>{al.student?.fullName}</strong> ({al.student?.studentCode}) — {al.violationType} (Lần {al.count}) trong bài <em>{al.quizTitle}</em>
             </div>
           ))}
         </div>
@@ -275,22 +277,21 @@ export default function CourseWorkspacePage() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
         {[
-          { id: 'lessons', label: 'BĂ i giáº£ng & TĂ i liá»‡u', icon: BookOpen },
-          { id: 'live', label: 'PhĂ²ng há»c Jitsi Live', icon: Video },
-          { id: 'assignments', label: 'BĂ i táº­p & QuĂ©t trĂ¹ng láº·p', icon: ClipboardList },
-          { id: 'quizzes', label: 'Thi GiĂ¡m sĂ¡t (Anti-Cheat)', icon: FileQuestion },
-          { id: 'discussions', label: 'Tháº£o luáº­n Lá»›p há»c', icon: MessageSquare },
+          { id: 'lessons', label: 'Bài giảng & Tài liệu', icon: BookOpen },
+          { id: 'live', label: 'Phòng học Jitsi Live', icon: Video },
+          { id: 'assignments', label: 'Bài tập & Quét trùng lặp', icon: ClipboardList },
+          { id: 'quizzes', label: 'Thi Giám sát (Anti-Cheat)', icon: FileQuestion },
+          { id: 'discussions', label: 'Thảo luận Lớp học', icon: MessageSquare },
         ].map((item) => {
           const Icon = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => setTab(item.id)}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                tab === item.id
+              className={`px-3.5 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${tab === item.id
                   ? 'bg-blue-700 text-white'
                   : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               {item.label}
@@ -310,7 +311,7 @@ export default function CourseWorkspacePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <span className="text-xs font-mono text-slate-400">
-                        ChÆ°Æ¡ng {idx + 1} â€¢ {lesson.durationMinutes} phĂºt
+                        Chương {idx + 1} • {lesson.durationMinutes} phút
                       </span>
                       <h3 className="font-semibold text-base text-slate-900">{lesson.title}</h3>
                     </div>
@@ -321,7 +322,7 @@ export default function CourseWorkspacePage() {
                         onClick={() => handleCompleteLesson(lesson._id)}
                       >
                         <CheckCircle2 className={`w-4 h-4 mr-1.5 ${isDone ? 'text-emerald-600' : ''}`} />
-                        {isDone ? 'ÄĂ£ hoĂ n thĂ nh' : 'ÄĂ¡nh dáº¥u hoĂ n thĂ nh'}
+                        {isDone ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành'}
                       </Button>
                     )}
                   </div>
@@ -334,11 +335,11 @@ export default function CourseWorkspacePage() {
           {isInstructor && (
             <div className="lg:col-span-4">
               <form onSubmit={handleAddLesson} className="p-5 rounded-xl bg-white border border-slate-200 space-y-3">
-                <h3 className="font-semibold text-sm text-slate-900">ThĂªm ChÆ°Æ¡ng / BĂ i giáº£ng má»›i</h3>
+                <h3 className="font-semibold text-sm text-slate-900">Thêm Chương / Bài giảng mới</h3>
                 <input
                   type="text"
                   required
-                  placeholder="TiĂªu Ä‘á» bĂ i giáº£ng"
+                  placeholder="Tiêu đề bài giảng"
                   value={lessonForm.title}
                   onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
                   className="w-full h-9 px-3 text-sm border border-slate-300 rounded-md"
@@ -346,13 +347,13 @@ export default function CourseWorkspacePage() {
                 <textarea
                   rows={4}
                   required
-                  placeholder="Ná»™i dung chi tiáº¿t bĂ i giáº£ng..."
+                  placeholder="Nội dung chi tiết bài giảng..."
                   value={lessonForm.content}
                   onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
                   className="w-full p-2.5 text-sm border border-slate-300 rounded-md"
                 />
                 <Button type="submit" variant="primary" size="sm" className="w-full">
-                  <Plus className="w-4 h-4 mr-1" /> ÄÄƒng bĂ i giáº£ng
+                  <Plus className="w-4 h-4 mr-1" /> Đăng bài giảng
                 </Button>
               </form>
             </div>
@@ -366,7 +367,7 @@ export default function CourseWorkspacePage() {
           {isInstructor && (
             <div className="flex justify-end">
               <Button variant="primary" size="sm" onClick={handleStartNewLive}>
-                <Radio className="w-4 h-4 mr-1.5" /> Khá»Ÿi táº¡o PhĂ²ng há»c Jitsi Meet
+                <Radio className="w-4 h-4 mr-1.5" /> Khởi tạo Phòng học Jitsi Meet
               </Button>
             </div>
           )}
@@ -384,11 +385,11 @@ export default function CourseWorkspacePage() {
                     </div>
                     <h3 className="font-semibold text-slate-900 mt-1">{s.title}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Chá»§ trĂ¬: {s.host?.fullName} â€¢ Äiá»ƒm danh: {s.attendees?.length || 0} há»c viĂªn
+                      Chủ trì: {s.host?.fullName} • Điểm danh: {s.attendees?.length || 0} học viên
                     </p>
                   </div>
                   <Button variant="primary" size="sm" onClick={() => joinLiveRoom(s)}>
-                    VĂ o phĂ²ng Jitsi
+                    Vào phòng Jitsi
                   </Button>
                 </div>
               ))}
@@ -398,11 +399,11 @@ export default function CourseWorkspacePage() {
               <div className="lg:col-span-8 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-mono text-blue-700">PHĂ’NG JITSI: {activeRoom.roomCode}</span>
+                    <span className="text-xs font-mono text-blue-700">PHÒNG JITSI: {activeRoom.roomCode}</span>
                     <h3 className="text-base font-bold text-slate-900">{activeRoom.title}</h3>
                   </div>
                   <Button variant="destructive" size="sm" onClick={() => setActiveRoom(null)}>
-                    Rá»i phĂ²ng há»c
+                    Rời phòng học
                   </Button>
                 </div>
 
@@ -421,7 +422,7 @@ export default function CourseWorkspacePage() {
 
               <div className="lg:col-span-4 flex flex-col border border-slate-200 rounded-lg h-[495px]">
                 <div className="p-3 border-b border-slate-200 text-xs font-semibold text-slate-700 flex items-center justify-between">
-                  <span>Tháº£o luáº­n lá»›p & Äiá»ƒm danh</span>
+                  <span>Thảo luận lớp & Điểm danh</span>
                   <span className="flex items-center gap-1 text-slate-500">
                     <Users className="w-3.5 h-3.5" /> {participants.length}
                   </span>
@@ -445,7 +446,7 @@ export default function CourseWorkspacePage() {
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Trao Ä‘á»•i trong lá»›p..."
+                    placeholder="Trao đổi trong lớp..."
                     className="flex-1 h-8 px-2.5 text-xs border border-slate-300 rounded"
                   />
                   <Button type="submit" size="sm">
@@ -469,7 +470,7 @@ export default function CourseWorkspacePage() {
                   <p className="text-sm text-slate-600 mt-1">{a.description}</p>
                 </div>
                 <span className="text-xs font-medium px-2.5 py-1 rounded bg-amber-50 text-amber-800">
-                  Háº¡n ná»™p: {formatDateTime(a.dueDate)}
+                  Hạn nộp: {formatDateTime(a.dueDate)}
                 </span>
               </div>
 
@@ -479,7 +480,7 @@ export default function CourseWorkspacePage() {
                     e.preventDefault();
                     const text = e.target.elements.submissionText.value;
                     const { data } = await api.post(`/assignments/${a._id}/submit`, { content: text });
-                    alert(`ÄĂ£ ná»™p bĂ i thĂ nh cĂ´ng! Tá»· lá»‡ trĂ¹ng láº·p há»c thuáº­t: ${data.similarityScore}%`);
+                    alert(`Đã nộp bài thành công! Tỷ lệ trùng lặp học thuật: ${data.similarityScore}%`);
                     e.target.reset();
                   }}
                   className="space-y-2 pt-2"
@@ -488,23 +489,23 @@ export default function CourseWorkspacePage() {
                     name="submissionText"
                     rows={3}
                     required
-                    placeholder="Nháº­p ná»™i dung bĂ i lĂ m hoáº·c bĂ¡o cĂ¡o thá»±c hĂ nh (Há»‡ thá»‘ng tá»± Ä‘á»™ng quĂ©t tá»· lá»‡ trĂ¹ng láº·p)..."
+                    placeholder="Nhập nội dung bài làm hoặc báo cáo thực hành (Hệ thống tự động quét tỷ lệ trùng lặp)..."
                     className="w-full p-2.5 text-sm border border-slate-300 rounded-md"
                   />
                   <Button type="submit" variant="primary" size="sm">
-                    Ná»™p bĂ i táº­p
+                    Nộp bài tập
                   </Button>
                 </form>
               ) : (
                 <div className="pt-2">
                   <Button variant="outline" size="sm" onClick={() => viewSubmissions(a._id)}>
-                    Xem danh sĂ¡ch bĂ i ná»™p & Káº¿t quáº£ quĂ©t trĂ¹ng láº·p
+                    Xem danh sách bài nộp & Kết quả quét trùng lặp
                   </Button>
 
                   {viewingAssignmentId === a._id && (
                     <div className="mt-3 border border-slate-200 rounded-lg divide-y divide-slate-100">
                       {selectedAssignmentSubmissions.length === 0 ? (
-                        <div className="p-4 text-xs text-slate-500">ChÆ°a cĂ³ sinh viĂªn nĂ o ná»™p bĂ i.</div>
+                        <div className="p-4 text-xs text-slate-500">Chưa có sinh viên nào nộp bài.</div>
                       ) : (
                         selectedAssignmentSubmissions.map((sub) => (
                           <div key={sub._id} className="p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -515,31 +516,30 @@ export default function CourseWorkspacePage() {
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <span
-                                className={`px-2 py-0.5 rounded font-semibold ${
-                                  sub.similarityScore >= 60
+                                className={`px-2 py-0.5 rounded font-semibold ${sub.similarityScore >= 60
                                     ? 'bg-red-100 text-red-800'
                                     : 'bg-emerald-50 text-emerald-700'
-                                }`}
+                                  }`}
                               >
-                                TrĂ¹ng láº·p: {sub.similarityScore}%
+                                Trùng lặp: {sub.similarityScore}%
                               </span>
                               {sub.score !== null && sub.score !== undefined && (
                                 <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-800 font-bold">
-                                  Äiá»ƒm: {sub.score}/10
+                                  Điểm: {sub.score}/10
                                 </span>
                               )}
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={async () => {
-                                  const sc = window.prompt(`Nháº­p Ä‘iá»ƒm (0-10) cho ${sub.student?.fullName}:`, sub.score ?? 8);
+                                  const sc = window.prompt(`Nhập điểm (0-10) cho ${sub.student?.fullName}:`, sub.score ?? 8);
                                   if (sc === null) return;
-                                  const fb = window.prompt('Nháº­n xĂ©t cá»§a giáº£ng viĂªn:', sub.feedback || 'HoĂ n thĂ nh tá»‘t.');
+                                  const fb = window.prompt('Nhận xét của giảng viên:', sub.feedback || 'Hoàn thành tốt.');
                                   await api.put(`/submissions/${sub._id}/grade`, { score: Number(sc), feedback: fb || '' });
                                   viewSubmissions(a._id);
                                 }}
                               >
-                                Cháº¥m Ä‘iá»ƒm
+                                Chấm điểm
                               </Button>
                             </div>
                           </div>
@@ -564,12 +564,12 @@ export default function CourseWorkspacePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-red-50 text-red-700">
-                        GiĂ¡m sĂ¡t chá»‘ng chuyá»ƒn tab
+                        Giám sát chống chuyển tab
                       </span>
                     </div>
                     <h3 className="font-semibold text-slate-900 mt-1">{q.title}</h3>
                     <p className="text-xs text-slate-500 mt-1">
-                      {q.questions?.length} cĂ¢u há»i â€¢ Thá»i gian: {q.durationMinutes} phĂºt â€¢ Tá»‘i Ä‘a {q.maxViolationsAllowed} láº§n cáº£nh bĂ¡o
+                      {q.questions?.length} câu hỏi • Thời gian: {q.durationMinutes} phút • Tối đa {q.maxViolationsAllowed} lần cảnh báo
                     </p>
                   </div>
                   <Button
@@ -583,7 +583,7 @@ export default function CourseWorkspacePage() {
                       setViolations([]);
                     }}
                   >
-                    Báº¯t Ä‘áº§u thi
+                    Bắt đầu thi
                   </Button>
                 </div>
               ))}
@@ -599,25 +599,25 @@ export default function CourseWorkspacePage() {
                   <h3 className="font-bold text-lg text-slate-900">{activeQuiz.title}</h3>
                   <div className="text-xs text-amber-700 flex items-center gap-1.5 mt-1">
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    Cháº¿ Ä‘á»™ giĂ¡m sĂ¡t Ä‘ang báº­t: KhĂ´ng chuyá»ƒn tab hoáº·c rá»i khá»i cá»­a sá»• trĂ¬nh duyá»‡t (Vi pháº¡m: {tabSwitchCount}/
+                    Chế độ giám sát đang bật: Không chuyển tab hoặc rời khỏi cửa sổ trình duyệt (Vi phạm: {tabSwitchCount}/
                     {activeQuiz.maxViolationsAllowed || 3})
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setActiveQuiz(null)}>
-                  ThoĂ¡t
+                  Thoát
                 </Button>
               </div>
 
               {quizResult ? (
                 <div className="p-6 rounded-lg bg-slate-50 border border-slate-200 text-center space-y-2">
-                  <div className="text-sm font-medium text-slate-600">Káº¿t quáº£ BĂ i kiá»ƒm tra GiĂ¡m sĂ¡t</div>
-                  <div className="text-3xl font-bold text-slate-900">{quizResult.score} / 10 Ä‘iá»ƒm</div>
+                  <div className="text-sm font-medium text-slate-600">Kết quả Bài kiểm tra Giám sát</div>
+                  <div className="text-3xl font-bold text-slate-900">{quizResult.score} / 10 điểm</div>
                   <div className="text-xs text-slate-600">
-                    ÄĂºng {quizResult.rawCorrect}/{quizResult.totalQuestions} cĂ¢u â€¢ Sá»‘ láº§n vi pháº¡m rá»i mĂ n hĂ¬nh: {quizResult.tabSwitchCount}
+                    Đúng {quizResult.rawCorrect}/{quizResult.totalQuestions} câu • Số lần vi phạm rời màn hình: {quizResult.tabSwitchCount}
                   </div>
                   {quizResult.autoSubmittedDueToCheating && (
                     <div className="text-xs font-semibold text-red-700">
-                      Há»‡ thá»‘ng Ä‘Ă£ tá»± Ä‘á»™ng thu bĂ i do vÆ°á»£t quĂ¡ sá»‘ láº§n vi pháº¡m quy cháº¿ thi!
+                      Hệ thống đã tự động thu bài do vượt quá số lần vi phạm quy chế thi!
                     </div>
                   )}
                 </div>
@@ -626,17 +626,16 @@ export default function CourseWorkspacePage() {
                   {activeQuiz.questions.map((q, qIdx) => (
                     <div key={qIdx} className="space-y-2">
                       <div className="font-medium text-sm text-slate-900">
-                        CĂ¢u {qIdx + 1}: {q.questionText}
+                        Câu {qIdx + 1}: {q.questionText}
                       </div>
                       <div className="grid sm:grid-cols-2 gap-2">
                         {q.options.map((opt, oIdx) => (
                           <label
                             key={oIdx}
-                            className={`p-3 rounded-lg border text-sm cursor-pointer flex items-center gap-2 ${
-                              quizAnswers[qIdx] === oIdx
+                            className={`p-3 rounded-lg border text-sm cursor-pointer flex items-center gap-2 ${quizAnswers[qIdx] === oIdx
                                 ? 'border-blue-700 bg-blue-50 text-blue-900 font-medium'
                                 : 'border-slate-200 hover:bg-slate-50'
-                            }`}
+                              }`}
                           >
                             <input
                               type="radio"
@@ -651,7 +650,7 @@ export default function CourseWorkspacePage() {
                     </div>
                   ))}
                   <Button variant="primary" onClick={() => submitQuizToServer(false)}>
-                    Ná»™p bĂ i kiá»ƒm tra
+                    Nộp bài kiểm tra
                   </Button>
                 </div>
               )}
@@ -696,11 +695,11 @@ export default function CourseWorkspacePage() {
                   <input
                     name="replyText"
                     type="text"
-                    placeholder="Viáº¿t pháº£n há»“i tháº£o luáº­n..."
+                    placeholder="Viết phản hồi thảo luận..."
                     className="flex-1 h-8 px-2.5 text-xs border border-slate-300 rounded-md"
                   />
                   <Button type="submit" variant="outline" size="sm">
-                    Tráº£ lá»i
+                    Trả lời
                   </Button>
                 </form>
               </div>
@@ -708,11 +707,11 @@ export default function CourseWorkspacePage() {
           </div>
           <div className="lg:col-span-4">
             <form onSubmit={handlePostDiscussion} className="p-5 rounded-xl bg-white border border-slate-200 space-y-3">
-              <h3 className="font-semibold text-sm text-slate-900">Táº¡o chá»§ Ä‘á» tháº£o luáº­n</h3>
+              <h3 className="font-semibold text-sm text-slate-900">Tạo chủ đề thảo luận</h3>
               <input
                 type="text"
                 required
-                placeholder="TiĂªu Ä‘á» cĂ¢u há»i"
+                placeholder="Tiêu đề câu hỏi"
                 value={discTitle}
                 onChange={(e) => setDiscTitle(e.target.value)}
                 className="w-full h-9 px-3 text-sm border border-slate-300 rounded-md"
@@ -720,13 +719,13 @@ export default function CourseWorkspacePage() {
               <textarea
                 rows={4}
                 required
-                placeholder="Ná»™i dung tháº£o luáº­n..."
+                placeholder="Nội dung thảo luận..."
                 value={discContent}
                 onChange={(e) => setDiscContent(e.target.value)}
                 className="w-full p-2.5 text-sm border border-slate-300 rounded-md"
               />
               <Button type="submit" variant="primary" size="sm" className="w-full">
-                ÄÄƒng tháº£o luáº­n
+                Đăng thảo luận
               </Button>
             </form>
           </div>
@@ -735,4 +734,3 @@ export default function CourseWorkspacePage() {
     </div>
   );
 }
-
