@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const path = require('path');
@@ -29,7 +29,7 @@ const corsOptions = {
     if (!origin || origin.startsWith('http://localhost:') || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('KhĂ´ng Ä‘Æ°á»£c phĂ©p truy cáº­p tá»« nguá»“n (CORS) nĂ y.'));
+    return callback(new Error('KhĂ´ng được phĂ©p truy cập từ nguồn (CORS) nĂ y.'));
   },
   credentials: true,
 };
@@ -53,7 +53,7 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// Chá»‘ng NoSQL Operator Injection ($, .)
+// Chống NoSQL Operator Injection ($, .)
 const sanitizeObject = (target) => {
   if (!target || typeof target !== 'object') return;
   if (Array.isArray(target)) {
@@ -84,7 +84,7 @@ const apiLimiter = rateLimit({
   max: 600,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'QuĂ¡ nhiá»u yĂªu cáº§u tá»« IP nĂ y, vui lĂ²ng thá»­ láº¡i sau 15 phĂºt.' },
+  message: { message: 'QuĂ¡ nhiều yĂªu cầu từ IP nĂ y, vui lĂ²ng thử lại sau 15 phĂºt.' },
 });
 
 const authSensitiveLimiter = rateLimit({
@@ -92,7 +92,7 @@ const authSensitiveLimiter = rateLimit({
   max: 25,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'Thao tĂ¡c xĂ¡c thá»±c quĂ¡ nhiá»u láº§n, vui lĂ²ng thá»­ láº¡i sau 15 phĂºt.' },
+  message: { message: 'Thao tĂ¡c xĂ¡c thực quĂ¡ nhiều lần, vui lĂ²ng thử lại sau 15 phĂºt.' },
 });
 
 app.use('/api', apiLimiter);
@@ -100,7 +100,7 @@ app.use('/api/auth/login', authSensitiveLimiter);
 app.use('/api/auth/change-password', authSensitiveLimiter);
 app.use('/api/auth/avatar', authSensitiveLimiter);
 
-// 4. STATIC UPLOADS (CHá»NG STORED XSS QUA FILE Táº¢I LĂN)
+// 4. STATIC UPLOADS (CHỐNG STORED XSS QUA FILE TẢI LĂN)
 const uploadsDir = path.join(__dirname, 'uploads');
 const avatarsDir = path.join(uploadsDir, 'avatars');
 if (!fs.existsSync(avatarsDir)) {
@@ -133,7 +133,7 @@ app.use('/api', apiRoutes);
 
 // 6. 404 & CENTRAL ERROR HANDLER
 app.use('/api', (req, res) => {
-  res.status(404).json({ message: `KhĂ´ng tĂ¬m tháº¥y Ä‘Æ°á»ng dáº«n API: ${req.originalUrl}` });
+  res.status(404).json({ message: `KhĂ´ng tĂ¬m thấy đường dẫn API: ${req.originalUrl}` });
 });
 
 app.use((err, req, res, next) => {
@@ -141,17 +141,17 @@ app.use((err, req, res, next) => {
     console.error('[Server Error]:', err.stack || err);
   }
   if (err.name === 'MulterError') {
-    return res.status(400).json({ message: `Lá»—i táº£i tá»‡p lĂªn: ${err.message}` });
+    return res.status(400).json({ message: `Lỗi tải tệp lĂªn: ${err.message}` });
   }
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ message: messages.join(', ') });
   }
   if (err.code === 11000) {
-    return res.status(400).json({ message: 'Dá»¯ liá»‡u Ä‘Ă£ tá»“n táº¡i trong há»‡ thá»‘ng.' });
+    return res.status(400).json({ message: 'Dữ liệu Ä‘Ă£ tồn tại trong hệ thống.' });
   }
   res.status(err.statusCode || err.status || 500).json({
-    message: err.message || 'Lá»—i mĂ¡y chá»§ ná»™i bá»™.',
+    message: err.message || 'Lỗi mĂ¡y chủ nội bộ.',
   });
 });
 
